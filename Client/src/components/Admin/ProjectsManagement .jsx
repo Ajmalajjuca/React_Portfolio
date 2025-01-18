@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Plus, Edit, Trash2, Save, X, Upload, Link as LinkIcon, ExternalLink } from 'lucide-react';
 import axios from 'axios';
 import { useEffect } from 'react';
+
+
 const ProjectsManagement = () => {
   const [projects, setProjects] = useState([]);
 
@@ -11,7 +13,7 @@ const ProjectsManagement = () => {
       setProjects(res.data.projects);
     };
     fetchProjects();
-  }, []);
+  }, [projects]);
 
   const [editingProject, setEditingProject] = useState(null);
   const [isAdding, setIsAdding] = useState(false);
@@ -26,6 +28,16 @@ const ProjectsManagement = () => {
   };
 
   const [newProject, setNewProject] = useState(initialProjectState);
+
+  const handleDeleteProject = async (id) => {
+    try {
+      console.log('id>>>>', id);
+      const res = await axios.delete(`http://localhost:3000/deleteProject/${id}`);
+      console.log('res.data>>>>', res.data);
+    } catch (error) {
+      console.log('handleDeleteProject error>>>>', error);
+    }
+  };
 
   const handleImageChange = (event) => {
     const file = event.target.files[0];
@@ -49,10 +61,20 @@ const ProjectsManagement = () => {
       formData.append('image', selectedFile);
     }
     if (editingProject) {
-      setProjects(projects.map(p => p.id === editingProject.id ? { ...newProject, id: editingProject.id } : p));
+      console.log('editingProject>>>>', editingProject);
+      console.log('formData>>>>', formData);
+      console.log('newProject>>>>', newProject);
+      const res = await axios.put(`http://localhost:3000/updateProject/${editingProject._id}`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      console.log('res.data>>>>', res.data);
       setEditingProject(null);
     } else {
       console.log('newProject>>>>', newProject);
+      console.log('formData>>>>', formData);
+      
       const res = await axios.post('http://localhost:3000/projects', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
@@ -206,7 +228,9 @@ const ProjectsManagement = () => {
                   <Edit className="h-4 w-4 text-blue-500" />
                 </button>
                 <button
-                  onClick={() => setProjects(projects.filter(p => p.id !== project.id))}
+                  onClick={() => {
+                    handleDeleteProject(project._id);
+                  }}
                   className="bg-white p-2 rounded-full shadow hover:bg-gray-100"
                 >
                   <Trash2 className="h-4 w-4 text-red-500" />
