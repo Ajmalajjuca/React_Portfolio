@@ -1,7 +1,19 @@
 import React, { useState } from 'react';
 import { Plus, Edit, Trash2, Save, X, Upload } from 'lucide-react';
+import axios from 'axios';
+import { useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { getSkills, addSkill, updateSkill, deleteSkill, setLoading, setError } from '../../Redux/Slice/skillSlice';
+import { Loader } from 'lucide-react';
+import { toast } from 'react-toastify';
+import { fetchSkills } from '../../Redux/Store/fetching';
+import SkillsSkeleton from './Skeletons/SkillsSkeleton';
 
 const SkillsManagement = () => {
+  const { skills } = useSelector(state => state.skill);
+  const { isLoading } = useSelector(state => state.skill);
+  const dispatch = useDispatch();
+
   // Predefined skill icons/logos mapping
   const skillIcons = {
     'React': '/api/placeholder/32/32',
@@ -18,12 +30,10 @@ const SkillsManagement = () => {
     'Git': '/api/placeholder/32/32'
   };
 
-  const [skills, setSkills] = useState([
-    { id: 1, name: 'React', proficiency: 90, category: 'Frontend', logo: '/api/placeholder/32/32' },
-    { id: 2, name: 'Node.js', proficiency: 85, category: 'Backend', logo: '/api/placeholder/32/32' },
-    { id: 3, name: 'Python', proficiency: 80, category: 'Backend', logo: '/api/placeholder/32/32' }
-  ]);
-  
+  useEffect(() => {
+    fetchSkills(dispatch);
+  }, []);
+
   const [editingSkill, setEditingSkill] = useState(null);
   const [isAdding, setIsAdding] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
@@ -32,10 +42,25 @@ const SkillsManagement = () => {
     name: '',
     proficiency: 0,
     category: '',
-    logo: '/api/placeholder/32/32'
+    logo: ''
   };
 
   const [newSkill, setNewSkill] = useState(initialSkillState);
+
+  const handleDeleteSkill = async (id) => {
+    dispatch(setLoading(true));
+    try {
+      const res = await axios.delete(`http://localhost:5000/deleteSkill/${id}`);
+      dispatch(deleteSkill(id));
+      toast.success('Skill deleted successfully');
+    } catch (error) {
+      console.log('handleDeleteSkill error>>>>', error);
+      toast.error('Skill deletion failed');
+    } finally {
+      dispatch(setLoading(false));
+      fetchSkills(dispatch);
+    }
+  };
 
   const handleLogoChange = (event) => {
     const file = event.target.files[0];
@@ -43,33 +68,62 @@ const SkillsManagement = () => {
       const reader = new FileReader();
       reader.onload = (e) => {
         setNewSkill({ ...newSkill, logo: e.target.result });
-        setSelectedFile(file.name);
+        setSelectedFile(file);
       };
       reader.readAsDataURL(file);
     }
   };
 
-  const handleSaveSkill = () => {
-    const skillToSave = {
-      ...newSkill,
-      logo: newSkill.logo || skillIcons[newSkill.name] || '/api/placeholder/32/32'
-    };
+  const handleSaveSkill = async () => {
+    try {
+      dispatch(setLoading(true));
+      const formData = new FormData();
+      formData.append('name', newSkill.name);
+      formData.append('proficiency', newSkill.proficiency);
+      formData.append('category', newSkill.category);
+      
+      if (selectedFile) {
+        formData.append('logo', selectedFile);
+      } else if (skillIcons[newSkill.name]) {
+        formData.append('logo', skillIcons[newSkill.name]);
+      }
 
-    if (editingSkill) {
-      setSkills(skills.map(s => s.id === editingSkill.id ? {...skillToSave, id: editingSkill.id} : s));
-      setEditingSkill(null);
-    } else {
-      setSkills([...skills, { ...skillToSave, id: Date.now() }]);
+      if (editingSkill) {
+        const res = await axios.put(`http://localhost:5000/updateSkill/${editingSkill._id}`, formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+        dispatch(updateSkill(res.data.skill));
+        toast.success('Skill updated successfully');
+        setEditingSkill(null);
+      } else {
+        const res = await axios.post('http://localhost:5000/skills', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+        dispatch(addSkill(res.data.skill));
+        toast.success('Skill added successfully');
+      }
       setIsAdding(false);
+      setNewSkill(initialSkillState);
+      setSelectedFile(null);
+    } catch (error) {
+      toast.error('Skill operation failed');
+      dispatch(setError(error.message));
+    } finally {
+      dispatch(setLoading(false));
+      fetchSkills(dispatch);
     }
-    setNewSkill(initialSkillState);
-    setSelectedFile(null);
   };
 
   // Suggested skills for autocomplete
   const suggestedSkills = Object.keys(skillIcons);
 
   return (
+    <>
+    {isLoading?<SkillsSkeleton/>:
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-xl font-bold">Skills</h2>
@@ -85,23 +139,21 @@ const SkillsManagement = () => {
 
       {/* Add/Edit Skill Form */}
       {(isAdding || editingSkill) && (
-        <div className="bg-gray-50 p-4 rounded-lg">
+        <div className="bg-gray-50 p-6 rounded-lg">
           <div className="space-y-4">
             {/* Logo Upload Section */}
-            <div className="flex items-center gap-4">
-              <div className="w-16 h-16 relative">
-                <img
-                  src={newSkill.logo}
-                  alt="Skill logo preview"
-                  className="w-full h-full object-contain border rounded-lg p-2"
-                />
-              </div>
-              <div className="flex-1">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Skill Logo
-                </label>
-                <div className="flex items-center gap-2">
-                  <label className="cursor-pointer bg-white px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-50 flex items-center gap-2">
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">Skill Logo</label>
+              <div className="flex items-start gap-4">
+                <div className="w-16 h-16 relative">
+                  <img
+                    src={newSkill.logo || '/api/placeholder/32/32'}
+                    alt="Skill logo preview"
+                    className="w-full h-full object-contain rounded-lg border p-2"
+                  />
+                </div>
+                <div className="flex-1">
+                  <label className="cursor-pointer bg-white px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-50 inline-flex items-center gap-2">
                     <Upload className="h-4 w-4 text-gray-500" />
                     <span className="text-sm text-gray-600">Choose Logo</span>
                     <input
@@ -112,13 +164,14 @@ const SkillsManagement = () => {
                     />
                   </label>
                   {selectedFile && (
-                    <span className="text-sm text-gray-500">{selectedFile}</span>
+                    <p className="mt-2 text-sm text-gray-500">{selectedFile.name}</p>
                   )}
                 </div>
               </div>
             </div>
 
-            <div className="relative">
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">Skill Name</label>
               <input
                 type="text"
                 list="skill-suggestions"
@@ -138,31 +191,38 @@ const SkillsManagement = () => {
               </datalist>
             </div>
 
-            <div className="flex gap-4">
-              <input
-                type="number"
-                placeholder="Proficiency (0-100)"
-                value={newSkill.proficiency}
-                onChange={(e) => setNewSkill({...newSkill, proficiency: parseInt(e.target.value)})}
-                className="flex-1 p-2 border rounded-md"
-                min="0"
-                max="100"
-              />
-              <input
-                type="text"
-                placeholder="Category"
-                value={newSkill.category}
-                onChange={(e) => setNewSkill({...newSkill, category: e.target.value})}
-                className="flex-1 p-2 border rounded-md"
-              />
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700">Proficiency</label>
+                <input
+                  type="number"
+                  placeholder="Proficiency (0-100)"
+                  value={newSkill.proficiency}
+                  onChange={(e) => setNewSkill({...newSkill, proficiency: parseInt(e.target.value)})}
+                  className="w-full p-2 border rounded-md"
+                  min="0"
+                  max="100"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700">Category</label>
+                <input
+                  type="text"
+                  placeholder="Category (e.g., Frontend, Backend)"
+                  value={newSkill.category}
+                  onChange={(e) => setNewSkill({...newSkill, category: e.target.value})}
+                  className="w-full p-2 border rounded-md"
+                />
+              </div>
             </div>
 
-            <div className="flex gap-2">
+            <div className="flex gap-2 pt-2">
               <button
                 onClick={handleSaveSkill}
                 className="bg-green-500 text-white px-4 py-2 rounded-md flex items-center gap-2"
               >
-                <Save className="h-4 w-4" /> Save
+                {editingSkill ? 'Update' : 'Add'}
+                {isLoading ? <Loader className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
               </button>
               <button
                 onClick={() => {
@@ -183,11 +243,11 @@ const SkillsManagement = () => {
       {/* Skills List */}
       <div className="grid gap-4">
         {skills.map(skill => (
-          <div key={skill.id} className="bg-white p-4 rounded-lg shadow">
+          <div key={skill._id} className="bg-white p-4 rounded-lg shadow">
             <div className="flex justify-between items-start">
               <div className="flex items-center gap-3 flex-1">
                 <img
-                  src={skill.logo}
+                  src={`http://localhost:5000${skill.logo}`}
                   alt={`${skill.name} logo`}
                   className="w-8 h-8 object-contain"
                 />
@@ -212,6 +272,7 @@ const SkillsManagement = () => {
               <div className="flex gap-2 ml-4">
                 <button
                   onClick={() => {
+                    setIsAdding(true);
                     setEditingSkill(skill);
                     setNewSkill(skill);
                   }}
@@ -220,7 +281,7 @@ const SkillsManagement = () => {
                   <Edit className="h-4 w-4" />
                 </button>
                 <button
-                  onClick={() => setSkills(skills.filter(s => s.id !== skill.id))}
+                  onClick={() => handleDeleteSkill(skill._id)}
                   className="text-red-500 p-1 hover:bg-red-50 rounded"
                 >
                   <Trash2 className="h-4 w-4" />
@@ -230,7 +291,8 @@ const SkillsManagement = () => {
           </div>
         ))}
       </div>
-    </div>
+    </div>}
+    </>
   );
 };
 

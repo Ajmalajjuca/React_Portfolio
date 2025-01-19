@@ -7,6 +7,8 @@ import { getProjects, addProject, updateProject, deleteProject, setLoading, setE
 import { Loader } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { fetchProjects } from '../../Redux/Store/fetching';
+import ProjectSkeleton from './Skeletons/ProjectSkeleton';
+
 
 const ProjectsManagement = () => {
   const { projects } = useSelector(state => state.project);
@@ -37,7 +39,7 @@ const ProjectsManagement = () => {
   const handleDeleteProject = async (id) => {
     dispatch(setLoading(true));
     try {
-      const res = await axios.delete(`http://localhost:3000/deleteProject/${id}`);
+      const res = await axios.delete(`http://localhost:5000/deleteProject/${id}`);
       dispatch(deleteProject(id));
       toast.success('Project deleted successfully');
     } catch (error) {
@@ -74,7 +76,7 @@ const ProjectsManagement = () => {
         formData.append('image', selectedFile);
       }
       if (editingProject) {
-        const res = await axios.put(`http://localhost:3000/updateProject/${editingProject._id}`, formData, {
+        const res = await axios.put(`http://localhost:5000/updateProject/${editingProject._id}`, formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
           },
@@ -84,7 +86,7 @@ const ProjectsManagement = () => {
         setEditingProject(null);
         setIsAdding(false);
       } else {
-        const res = await axios.post('http://localhost:3000/projects', formData, {
+        const res = await axios.post('http://localhost:5000/projects', formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
           },
@@ -105,6 +107,8 @@ const ProjectsManagement = () => {
   };
 
   return (
+    <>
+    {isLoading?<ProjectSkeleton/>:
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-xl font-bold">Projects</h2>
@@ -240,7 +244,7 @@ const ProjectsManagement = () => {
           <div key={project.title} className="bg-white rounded-lg shadow overflow-hidden">
             <div className="relative h-48">
               <img
-                src={`http://localhost:3000${project.image}`}
+                src={`http://localhost:5000${project.image}`}
                 alt={project.title}
                 className="w-full h-full object-cover"
               />
@@ -308,7 +312,8 @@ const ProjectsManagement = () => {
           </div>
         ))}
       </div>
-    </div>
+    </div>}
+    </>
   );
 };
 

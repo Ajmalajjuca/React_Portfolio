@@ -2,13 +2,13 @@ import express from 'express'
 import cors from 'cors'
 import connectDB from './Src/utils/db.js';
 import dotenv from 'dotenv';
-import router from './Src/Router/ProjectRoute.js';
+import router from './Src/Router/Route.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
 dotenv.config();
 
-const PORT = 3000;
+const PORT = 5000;
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
