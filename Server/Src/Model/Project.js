@@ -4,7 +4,8 @@ const projectSchema = new mongoose.Schema({
     description: { type: String, required: true, trim: true },
     image: { type: String,default:''},
     link: { type: String, required: true, match: /^https?:\/\/.*/ },
-    technologies: { type: [String], required: true }
+    technologies: { type: [String], required: true },
+    githubLink: { type: String, match: /^https?:\/\/.*/ }
 });
 
 const Project = mongoose.model("Project", projectSchema);

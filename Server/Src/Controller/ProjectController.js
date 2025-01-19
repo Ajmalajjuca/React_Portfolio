@@ -5,8 +5,8 @@ export const postProjects = async (req, res) => {
     console.log('req.bodys>>>>', req.body);
     const file = req.file;
     console.log('file>>>>', file);
-    const { title, description, link, technologies } = req.body;
-    if (!title || !description || !link || !file || !technologies) {
+    const { title, description, link, technologies, githubLink } = req.body;
+    if (!title || !description || !link || !file || !technologies || !githubLink) {
         return res.status(400).json({ message: "All fields are required" });
     }
     const filePath = path.join('uploads', file.filename);
@@ -18,6 +18,7 @@ export const postProjects = async (req, res) => {
             link,
             technologies: technologies.split(','),
             image: '/uploads/' + req.file.filename, // Adjust the path based on your server setup
+            githubLink
         });
         console.log('newProject>>>>', newProject);
         const savedProject = await newProject.save();
@@ -52,16 +53,16 @@ export const deleteProject = async (req, res) => {
 
 export const updateProject = async (req, res) => {
     const { id } = req.params;
-    const { title, description, link, technologies } = req.body;
+    const { title, description, link, technologies, githubLink } = req.body;
     const file = req.file;
     console.log('file>>>>', file);
     console.log('req.body>>>>', req.body);
     
-    if (!title || !description || !link || !technologies) {
+    if (!title || !description || !link || !technologies || !githubLink) {
         return res.status(400).json({ message: "All fields are required" });
     }
     try {
-        const project = await Project.findByIdAndUpdate(id, { title, description, link, technologies, image: '/uploads/' + file.filename });
+        const project = await Project.findByIdAndUpdate(id, { title, description, link, technologies, image: '/uploads/' + file.filename, githubLink });
         res.status(200).json({ message: "Project updated successfully", project });
     } catch (error) {
         console.log('updateProject error>>>>', error);

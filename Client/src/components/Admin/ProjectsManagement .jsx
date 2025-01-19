@@ -1,19 +1,23 @@
 import React, { useState } from 'react';
-import { Plus, Edit, Trash2, Save, X, Upload, Link as LinkIcon, ExternalLink } from 'lucide-react';
+import { Plus, Edit, Trash2, Save, X, Upload, Link as LinkIcon, ExternalLink, Github } from 'lucide-react';
 import axios from 'axios';
 import { useEffect } from 'react';
-
+import { useSelector, useDispatch } from 'react-redux';
+import { getProjects, addProject, updateProject, deleteProject, setLoading, setError } from '../../Redux/Slice/pojectSlice';
+import { Loader } from 'lucide-react';
+import { toast } from 'react-toastify';
+import { fetchProjects } from '../../Redux/Store/fetching';
 
 const ProjectsManagement = () => {
-  const [projects, setProjects] = useState([]);
+  const { projects } = useSelector(state => state.project);
+  const { isLoading } = useSelector(state => state.project);
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    const fetchProjects = async () => {
-      const res = await axios.get('http://localhost:3000/getProjects');
-      setProjects(res.data.projects);
-    };
-    fetchProjects();
-  }, [projects]);
+    fetchProjects(dispatch);
+  }, []);
+    
+
 
   const [editingProject, setEditingProject] = useState(null);
   const [isAdding, setIsAdding] = useState(false);
@@ -24,18 +28,24 @@ const ProjectsManagement = () => {
     description: '',
     image: '',
     link: '',
+    githubLink: '', // Added GitHub link field
     technologies: []
   };
 
   const [newProject, setNewProject] = useState(initialProjectState);
 
   const handleDeleteProject = async (id) => {
+    dispatch(setLoading(true));
     try {
-      console.log('id>>>>', id);
       const res = await axios.delete(`http://localhost:3000/deleteProject/${id}`);
-      console.log('res.data>>>>', res.data);
+      dispatch(deleteProject(id));
+      toast.success('Project deleted successfully');
     } catch (error) {
       console.log('handleDeleteProject error>>>>', error);
+      toast.error('Project deletion failed');
+    } finally {
+      dispatch(setLoading(false));
+      fetchProjects(dispatch);
     }
   };
 
@@ -45,48 +55,53 @@ const ProjectsManagement = () => {
       const reader = new FileReader();
       reader.onload = (e) => {
         setNewProject({ ...newProject, image: e.target.result });
-        setSelectedFile(file); // Store the entire file object
+        setSelectedFile(file);
       };
       reader.readAsDataURL(file);
     }
   };
 
   const handleSaveProject = async () => {
-    const formData = new FormData();
-    formData.append('title', newProject.title);
-    formData.append('description', newProject.description);
-    formData.append('link', newProject.link);
-    formData.append('technologies', newProject.technologies.join(','));
-    if (selectedFile) {
-      formData.append('image', selectedFile);
+    try {
+      dispatch(setLoading(true));
+      const formData = new FormData();
+      formData.append('title', newProject.title);
+      formData.append('description', newProject.description);
+      formData.append('link', newProject.link);
+      formData.append('githubLink', newProject.githubLink); // Added GitHub link
+      formData.append('technologies', newProject.technologies.join(','));
+      if (selectedFile) {
+        formData.append('image', selectedFile);
+      }
+      if (editingProject) {
+        const res = await axios.put(`http://localhost:3000/updateProject/${editingProject._id}`, formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+        dispatch(updateProject(res.data.project));
+        toast.success('Project updated successfully');
+        setEditingProject(null);
+        setIsAdding(false);
+      } else {
+        const res = await axios.post('http://localhost:3000/projects', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+        dispatch(addProject(res.data.project));
+        toast.success('Project added successfully');
+        setIsAdding(false);
+      }
+      setNewProject(initialProjectState);
+      setSelectedFile(null);
+    } catch (error) {
+      toast.error('Project operation failed');
+      dispatch(setError(error.message));
+    } finally {
+      dispatch(setLoading(false));
+      fetchProjects(dispatch);
     }
-    if (editingProject) {
-      console.log('editingProject>>>>', editingProject);
-      console.log('formData>>>>', formData);
-      console.log('newProject>>>>', newProject);
-      const res = await axios.put(`http://localhost:3000/updateProject/${editingProject._id}`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-      console.log('res.data>>>>', res.data);
-      setEditingProject(null);
-    } else {
-      console.log('newProject>>>>', newProject);
-      console.log('formData>>>>', formData);
-      
-      const res = await axios.post('http://localhost:3000/projects', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-      console.log('res.data>>>>', res.data);
-      setProjects([...projects, res.data.project]);
-      console.log(res.data);
-      setIsAdding(false);
-    }
-    setNewProject(initialProjectState);
-    setSelectedFile(null);
   };
 
   return (
@@ -160,7 +175,7 @@ const ProjectsManagement = () => {
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-700">Project Link</label>
+                <label className="block text-sm font-medium text-gray-700">Live Demo Link</label>
                 <input
                   type="url"
                   placeholder="https://..."
@@ -170,18 +185,29 @@ const ProjectsManagement = () => {
                 />
               </div>
               <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-700">Technologies</label>
+                <label className="block text-sm font-medium text-gray-700">GitHub Link</label>
                 <input
-                  type="text"
-                  placeholder="React, Node.js, MongoDB..."
-                  value={newProject.technologies.join(', ')}
-                  onChange={(e) => setNewProject({
-                    ...newProject,
-                    technologies: e.target.value.split(',').map(t => t.trim()).filter(t => t)
-                  })}
+                  type="url"
+                  placeholder="https://github.com/..."
+                  value={newProject.githubLink}
+                  onChange={(e) => setNewProject({ ...newProject, githubLink: e.target.value })}
                   className="w-full p-2 border rounded-md"
                 />
               </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">Technologies</label>
+              <input
+                type="text"
+                placeholder="React, Node.js, MongoDB..."
+                value={newProject.technologies.join(', ')}
+                onChange={(e) => setNewProject({
+                  ...newProject,
+                  technologies: e.target.value.split(',').map(t => t.trim()).filter(t => t)
+                })}
+                className="w-full p-2 border rounded-md"
+              />
             </div>
 
             <div className="flex gap-2 pt-2">
@@ -189,7 +215,8 @@ const ProjectsManagement = () => {
                 onClick={handleSaveProject}
                 className="bg-green-500 text-white px-4 py-2 rounded-md flex items-center gap-2"
               >
-                <Save className="h-4 w-4" /> Save
+                {editingProject ? 'Update' : 'Add'}
+                {isLoading ? <Loader className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
               </button>
               <button
                 onClick={() => {
@@ -220,6 +247,7 @@ const ProjectsManagement = () => {
               <div className="absolute top-2 right-2 flex gap-2">
                 <button
                   onClick={() => {
+                    setIsAdding(true);
                     setEditingProject(project);
                     setNewProject(project);
                   }}
@@ -228,9 +256,7 @@ const ProjectsManagement = () => {
                   <Edit className="h-4 w-4 text-blue-500" />
                 </button>
                 <button
-                  onClick={() => {
-                    handleDeleteProject(project._id);
-                  }}
+                  onClick={() => handleDeleteProject(project._id)}
                   className="bg-white p-2 rounded-full shadow hover:bg-gray-100"
                 >
                   <Trash2 className="h-4 w-4 text-red-500" />
@@ -242,17 +268,28 @@ const ProjectsManagement = () => {
               <div>
                 <div className="flex items-center justify-between">
                   <h3 className="text-lg font-semibold">{project.title}</h3>
-                  {project.link && (
-                    <a
-                      href={project.link}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-500 hover:text-blue-600 flex items-center gap-1"
-                    >
-                      <LinkIcon className="h-4 w-4" />
-                      <ExternalLink className="h-4 w-4" />
-                    </a>
-                  )}
+                  <div className="flex gap-2">
+                    {project.githubLink && (
+                      <a
+                        href={project.githubLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-gray-600 hover:text-gray-800"
+                      >
+                        <Github className="h-4 w-4" />
+                      </a>
+                    )}
+                    {project.link && (
+                      <a
+                        href={project.link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-500 hover:text-blue-600"
+                      >
+                        <ExternalLink className="h-4 w-4" />
+                      </a>
+                    )}
+                  </div>
                 </div>
                 <p className="text-gray-600 mt-1">{project.description}</p>
               </div>
