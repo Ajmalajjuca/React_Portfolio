@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { getSkills, setLoading as setSkillsLoading, setError as setSkillsError } from '../Slice/skillSlice';
 import { getProjects, setLoading as setProjectsLoading, setError as setProjectsError } from '../Slice/pojectSlice';
+import { getProfile, setProfileLoading, setProfileError } from '../Slice/profileSlice';
 
 export const fetchProjects = async (dispatch) => {
   dispatch(setProjectsLoading(true));
@@ -24,5 +25,22 @@ export const fetchSkills = async (dispatch) => {
     dispatch(setSkillsError(error.message));
   } finally {
     dispatch(setSkillsLoading(false));
+  }
+};
+
+export const fetchProfile = async (dispatch) => {
+  dispatch(setProfileLoading(true));
+  try {
+    console.log('fetchProfile');
+    const response = await axios.get('http://localhost:5000/profile');
+    console.log('response>>>>', response);
+    if (response.data.profile) {
+      dispatch(getProfile(response.data.profile));
+    }
+  } catch (error) {
+    console.error('Error fetching profile:', error);
+    dispatch(setProfileError(error.message));
+  } finally {
+    dispatch(setProfileLoading(false));
   }
 };
