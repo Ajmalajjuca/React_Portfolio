@@ -3,10 +3,10 @@ import { Plus, Edit, Trash2, Save, X, Upload } from 'lucide-react';
 import axios from 'axios';
 import { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { getSkills, addSkill, updateSkill, deleteSkill, setLoading, setError } from '../../Redux/Slice/skillSlice';
+import { getSkills, addSkill, updateSkill, deleteSkill, setLoading, setError } from '../../redux/Slice/skillSlice';
 import { Loader } from 'lucide-react';
 import { toast } from 'react-toastify';
-import { fetchSkills } from '../../Redux/Store/fetching';
+import { fetchSkills } from '../../redux/Store/fetching';
 import SkillsSkeleton from './Skeletons/SkillsSkeleton';
 
 const SkillsManagement = () => {
@@ -50,7 +50,11 @@ const SkillsManagement = () => {
   const handleDeleteSkill = async (id) => {
     dispatch(setLoading(true));
     try {
-      const res = await axios.delete(`http://localhost:5000/deleteSkill/${id}`);
+      const res = await axios.delete(`http://localhost:5000/deleteSkill/${id}`,{
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
       dispatch(deleteSkill(id));
       toast.success('Skill deleted successfully');
     } catch (error) {
@@ -92,6 +96,7 @@ const SkillsManagement = () => {
         const res = await axios.put(`http://localhost:5000/updateSkill/${editingSkill._id}`, formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
           },
         });
         dispatch(updateSkill(res.data.skill));
@@ -101,6 +106,7 @@ const SkillsManagement = () => {
         const res = await axios.post('http://localhost:5000/skills', formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
           },
         });
         dispatch(addSkill(res.data.skill));
@@ -192,18 +198,7 @@ const SkillsManagement = () => {
             </div>
 
             <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-700">Proficiency</label>
-                <input
-                  type="number"
-                  placeholder="Proficiency (0-100)"
-                  value={newSkill.proficiency}
-                  onChange={(e) => setNewSkill({...newSkill, proficiency: parseInt(e.target.value)})}
-                  className="w-full p-2 border rounded-md"
-                  min="0"
-                  max="100"
-                />
-              </div>
+              
               <div className="space-y-2">
                 <label className="block text-sm font-medium text-gray-700">Category</label>
                 <input
@@ -258,15 +253,7 @@ const SkillsManagement = () => {
                       {skill.category}
                     </span>
                   </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2.5">
-                    <div
-                      className="bg-blue-500 h-2.5 rounded-full transition-all duration-300"
-                      style={{ width: `${skill.proficiency}%` }}
-                    ></div>
-                  </div>
-                  <div className="mt-1 text-sm text-gray-500">
-                    Proficiency: {skill.proficiency}%
-                  </div>
+                  
                 </div>
               </div>
               <div className="flex gap-2 ml-4">

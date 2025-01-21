@@ -3,9 +3,9 @@ import React, { useState, useEffect } from 'react';
 import { Edit, Save, X, Camera, Loader } from 'lucide-react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
-import { fetchProfile } from '../../Redux/Store/fetching';
+import { fetchProfile } from '../../redux/Store/fetching';
 import { useDispatch, useSelector } from 'react-redux';
-import { getProfile, setProfile, setEditedProfile, setProfileLoading, setProfileError } from '../../Redux/Slice/profileSlice';
+import ProfileSkeleton from './Skeletons/ProfileSkeleton';
 
 
 const ProfileManagement = () => {
@@ -101,7 +101,7 @@ const ProfileManagement = () => {
         const method = profiles[0]._id ? 'put' : 'post';
         
         const response = await axios[method](url, formData, {
-          headers: { 'Content-Type': 'multipart/form-data' }
+          headers: { 'Content-Type': 'multipart/form-data', 'Authorization': `Bearer ${localStorage.getItem('token')}` }
         });
 
         setProfile(response.data.profile);
@@ -294,9 +294,7 @@ const ProfileManagement = () => {
           <div className="space-y-6">
             
             {loading ?
-              <div className="flex justify-center items-center h-64">
-                <Loader className="h-8 w-8 animate-spin text-blue-500" />
-              </div>
+              <ProfileSkeleton/>
             :
             <>
             <div>

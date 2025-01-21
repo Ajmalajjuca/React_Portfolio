@@ -1,17 +1,22 @@
 import React from "react";
-import MernStack from "../../assets/mernstack.png";
-import Html from "../../assets/Html.png";
-import Css from "../../assets/CSS.png";
-import Javascript from "../../assets/JS.png";
-import ReactLogo from "../../assets/React.png";
-import Tailwind from "../../assets/Tailwind Css.png";
-import MongoDb from "../../assets/mongodb.svg";
-import NodeLogo from "../../assets/NodeLogo.png";
-import Golang from "../../assets/Go-Logo_Blue (1).svg";
-import Express from "../../assets/Express.png";
-import NextJs from "../../assets/NextJs.png";
+import {useEffect} from 'react';
+import {useSelector,useDispatch} from 'react-redux';
+import {fetchProfile, fetchSkills} from '../../redux/Store/fetching';
 
 const   About = () => {
+  const profile = useSelector(state => state.profile);
+  const dispatch = useDispatch();
+  useEffect(() => {
+    fetchProfile(dispatch);
+    
+  }, []);
+  
+  useEffect(() => {
+    fetchSkills(dispatch);
+  }, []);
+  
+  const skill = useSelector(state => state.skill);
+  
   return (
     <div className="relative" id="about">
       <div className="bg-gradient-to-b from-gray-50 to-gray-200 py-16">
@@ -21,10 +26,11 @@ const   About = () => {
               About Me
             </h2>
             <p className="mt-3 text-4xl font-bold text-gray-900 sm:text-5xl">
-              Hi, I'm Ajmal C A
+              {console.log('profile>>>>',profile.profile[0]?.name)}
+              Hi, I'm {profile.profile[0]?.name}
             </p>
             <p className="mt-4 max-w-2xl text-xl text-gray-600 mx-auto leading-relaxed">
-              A Full-Stack Developer with expertise in web development
+              {profile.profile[0]?.title}
             </p>
           </div>
           <div className="mt-16">
@@ -34,13 +40,7 @@ const   About = () => {
                   My Journey
                 </h3>
                 <p className="text-lg text-gray-600 leading-relaxed">
-                  I began my web development journey with a passion for building
-                  intuitive and scalable applications. Proficient in the MERN
-                  stack (MongoDB, Express.js, React, Node.js), I have
-                  developed projects including a full-stack E-commerce 
-                  website, CURD Application, Olx Clone and a Netflix clone. These projects
-                  showcase my ability to combine robust backend solutions with
-                  sleek, user-friendly frontend designs.
+                  {profile.profile[0]?.journey}
                 </p>
                 <img src="" alt="" className="p-2 rounded-lg w-52 mt-4" />
               </div>
@@ -49,43 +49,12 @@ const   About = () => {
                   Skills & Expertise
                 </h3>
                 <div className="flex items-center justify-center flex-wrap gap-4">
-                  <div className="bg-gray-50 flex items-center gap-2 px-4 py-2 rounded-xl hover:shadow-md transition-all duration-300">
-                    <img src={Html} alt="HTML" className="w-8" />
-                    <span className="font-medium">HTML</span>
-                  </div>
-                  <div className="bg-gray-50 flex items-center gap-2 px-4 py-2 rounded-xl hover:shadow-md transition-all duration-300">
-                    <img src={Css} alt="CSS" className="w-8" />
-                    <span className="font-medium">CSS</span>
-                  </div>
-                  <div className="bg-gray-50 flex items-center gap-2 px-4 py-2 rounded-xl hover:shadow-md transition-all duration-300">
-                    <img src={Javascript} alt="Javascript" className="w-8" />
-                    <span className="font-medium">Javascript</span>
-                  </div>
-                  <div className="bg-gray-50 flex items-center gap-2 px-4 py-2 rounded-xl hover:shadow-md transition-all duration-300">
-                    <img src={ReactLogo} alt="React" className="w-8 rounded-full" />
-                    <span className="font-medium">React</span>
-                  </div>
-                  <div className="bg-gray-50 flex items-center gap-2 px-4 py-2 rounded-xl hover:shadow-md transition-all duration-300">
-                    <img src={Tailwind} alt="Tailwind Css" className="w-8 rounded-full" />
-                    <span className="font-medium">Tailwind Css</span>
-                  </div>
-                  <div className="bg-gray-50 flex items-center gap-2 px-4 py-2 rounded-xl hover:shadow-md transition-all duration-300">
-                    <img src={MongoDb} alt="Mongodb" className="w-8" />
-                    <span className="font-medium">Mongodb</span>
-                  </div>
-                  <div className="bg-gray-50 flex items-center gap-2 px-4 py-2 rounded-xl hover:shadow-md transition-all duration-300">
-                    <img src={NodeLogo} alt="Node Js" className="w-8" />
-                    <span className="font-medium">Node Js</span>
-                  </div>
-                  
-                  <div className="bg-gray-50 flex items-center gap-2 px-4 py-2 rounded-xl hover:shadow-md transition-all duration-300">
-                    <img src={Express} alt="Express Js" className="w-8" />
-                    <span className="font-medium">Express Js</span>
-                  </div>
-                  <div className="bg-gray-50 flex items-center gap-2 px-4 py-2 rounded-xl hover:shadow-md transition-all duration-300">
-                    <img src={NextJs} alt="Next Js" className="w-8" />
-                    <span className="font-medium">Next Js</span>
-                  </div>
+                  {skill.skills.map((skill,index) => (
+                    <div key={index} className="bg-gray-50 flex items-center gap-2 px-4 py-2 rounded-xl hover:shadow-md transition-all duration-300">
+                      <img src={`http://localhost:5000${skill.logo}`} alt={skill.name} className="w-8" />
+                      <span className="font-medium">{skill.name}</span>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
@@ -95,13 +64,7 @@ const   About = () => {
               More About Me
             </h3>
             <p className="mt-6 text-lg text-gray-600 leading-relaxed">
-              In addition to coding, I’m deeply passionate about learning new
-              technologies and staying up-to-date with the latest trends in web
-              development. I also run a YouTube channel where I share my
-              knowledge on topics like JavaScript, MERN Stack development,
-              and digital marketing. Through my channel, I help
-              others explore and dive deep into the world of programming and
-              technology.
+              {profile.profile[0]?.bio}
             </p>
           </div>
         </div>

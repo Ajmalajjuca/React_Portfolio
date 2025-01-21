@@ -5,8 +5,19 @@ import SpicyBites from "../../assets/SpicyBites.png";
 import Youtube from "../../assets/Screenshot 2024-12-14 at 7.56.15 PM.jpeg";
 import Gemini from "../../assets/Gemini.jpeg";
 import Supercar from "../../assets/Supercar.png";
+import { useSelector, useDispatch } from "react-redux";
+import { fetchProjects } from "../../redux/Store/fetching";
+import { useEffect } from "react";
+import { ExternalLink, Github } from "lucide-react";
 
 const Projects = () => {
+  const dispatch = useDispatch();
+  const projects = useSelector(state => state.project);
+  useEffect(() => {
+    fetchProjects(dispatch);
+  }, []);
+  console.log('projects>>>>',projects.projects);
+  
   const projectJson = [
     {
       id: 1,
@@ -69,48 +80,68 @@ const Projects = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {projectJson.map((item) => (
-            <div
-              key={item.id}
-              className="group bg-gray-800 rounded-xl overflow-hidden transform hover:-translate-y-2 transition-all duration-300 shadow-xl hover:shadow-2xl"
-            >
-              <div className="relative overflow-hidden h-48">
-                <img
-                  src={item.image}
-                  alt={item.title}
-                  className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-300"
-                />
-                <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-4">
-                  <a
-                    href={item.live}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="bg-indigo-600 text-white px-4 py-2 rounded-full hover:bg-indigo-700 transition-colors"
-                  >
-                    Live Demo
-                  </a>
-                  <a
-                    href={item.github}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="bg-gray-700 text-white px-4 py-2 rounded-full hover:bg-gray-600 transition-colors"
-                  >
-                    GitHub
-                  </a>
-                </div>
-              </div>
+      {projects.projects.map((item) => (
+        <div
+          key={item.id}
+          className="group bg-gray-800 rounded-xl overflow-hidden transform hover:-translate-y-2 transition-all duration-300 shadow-xl hover:shadow-2xl"
+        >
+          {/* Image Section */}
+          <div className="relative overflow-hidden h-48">
+            <img
+              src={`http://localhost:5000${item.image}`}
+              alt={item.title}
+              className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-300"
+            />
+            <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-4">
+              <a
+                href={item.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-indigo-600 text-white px-4 py-2 rounded-full hover:bg-indigo-700 transition-colors flex items-center gap-2"
+              >
+                <ExternalLink className="h-4 w-4" />
+                Live Demo
+              </a>
+              <a
+                href={item.githubLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-gray-700 text-white px-4 py-2 rounded-full hover:bg-gray-600 transition-colors flex items-center gap-2"
+              >
+                <Github className="h-4 w-4" />
+                GitHub
+              </a>
+            </div>
+          </div>
 
-              <div className="p-6">
-                <h3 className="text-xl font-bold text-white mb-2">
-                  {item.title}
-                </h3>
-                <p className="text-gray-400 text-sm leading-relaxed">
-                  {item.desc}
-                </p>
+          {/* Content Section */}
+          <div className="p-6 space-y-4">
+            <div>
+              <h3 className="text-xl font-bold text-white mb-2">
+                {item.title}
+              </h3>
+              <p className="text-gray-400 text-sm leading-relaxed line-clamp-2">
+                {item.description}
+              </p>
+            </div>
+
+            {/* Technologies */}
+            <div className="pt-4 border-t border-gray-700">
+              <div className="flex flex-wrap gap-2">
+                {item.technologies.map((tech, index) => (
+                  <span
+                    key={index}
+                    className="bg-indigo-900 bg-opacity-50 text-indigo-300 px-2 py-1 rounded-md text-xs font-medium"
+                  >
+                    {tech}
+                  </span>
+                ))}
               </div>
             </div>
-          ))}
+          </div>
         </div>
+      ))}
+    </div>
       </div>
     </section>
   );

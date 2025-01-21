@@ -3,10 +3,10 @@ import { Plus, Edit, Trash2, Save, X, Upload, Link as LinkIcon, ExternalLink, Gi
 import axios from 'axios';
 import { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { getProjects, addProject, updateProject, deleteProject, setLoading, setError } from '../../Redux/Slice/pojectSlice';
+import { getProjects, addProject, updateProject, deleteProject, setLoading, setError } from '../../redux/Slice/pojectSlice';
 import { Loader } from 'lucide-react';
 import { toast } from 'react-toastify';
-import { fetchProjects } from '../../Redux/Store/fetching';
+import { fetchProjects } from '../../redux/Store/fetching';
 import ProjectSkeleton from './Skeletons/ProjectSkeleton';
 
 
@@ -39,7 +39,11 @@ const ProjectsManagement = () => {
   const handleDeleteProject = async (id) => {
     dispatch(setLoading(true));
     try {
-      const res = await axios.delete(`http://localhost:5000/deleteProject/${id}`);
+      const res = await axios.delete(`http://localhost:5000/deleteProject/${id}`,{
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
       dispatch(deleteProject(id));
       toast.success('Project deleted successfully');
     } catch (error) {
@@ -79,6 +83,7 @@ const ProjectsManagement = () => {
         const res = await axios.put(`http://localhost:5000/updateProject/${editingProject._id}`, formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
           },
         });
         dispatch(updateProject(res.data.project));
@@ -89,6 +94,7 @@ const ProjectsManagement = () => {
         const res = await axios.post('http://localhost:5000/projects', formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
           },
         });
         dispatch(addProject(res.data.project));
@@ -241,7 +247,7 @@ const ProjectsManagement = () => {
       {/* Projects List */}
       <div className="grid gap-6">
         {projects.map(project => (
-          <div key={project.title} className="bg-white rounded-lg shadow overflow-hidden">
+          <div key={project._id} className="bg-white rounded-lg shadow overflow-hidden">
             <div className="relative h-48">
               <img
                 src={`http://localhost:5000${project.image}`}

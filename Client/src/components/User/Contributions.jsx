@@ -10,8 +10,8 @@ const Contributions = () => {
   const [error, setError] = useState(null);
   const [rank, setRank] = useState(null);
 
-  const githubUsername = import.meta.env.GIT_USERNAME;
-  const leetCodeUsername = import.meta.env.LEETCODE_USERNAME;
+  const githubUsername = 'Ajmalajjuca';
+  const leetCodeUsername = 'ajmal_ca';
 
   useEffect(() => {
     const fetchLeetCodeStats = async () => {

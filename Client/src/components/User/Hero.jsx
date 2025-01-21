@@ -1,13 +1,19 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { FaInstagram, FaLinkedin } from "react-icons/fa";
 import { FaXTwitter } from "react-icons/fa6";
 import { FaGithub } from "react-icons/fa";
 import hero from "../../assets/a-realistic-cartoon-portrait-of-a-23-yea_ysAsbjWOSsSNA4hTWVix3g_ErxRV28sSyqTkSTdwUITAA-Photoroom.png";
-import reactLogo from "../../assets/React.png";
-import reduxLogo from "../../assets/NextJs.png";
-import tailwind from "../../assets/Tailwind Css.png";
+import { useSelector, useDispatch } from "react-redux";
+import { fetchProfile,fetchSkills } from "../../redux/Store/fetching";
 /* bg-[#FEFEFE] */
 const Hero = () => {
+  const profile = useSelector(state => state.profile);
+  const skills = useSelector(state => state.skill);
+  const dispatch = useDispatch();
+  useEffect(() => {
+    fetchProfile(dispatch);
+    fetchSkills(dispatch);
+  }, []);
   return (
     <section className="relative ">
       <div className="max-w-7xl mx-auto ">
@@ -15,7 +21,7 @@ const Hero = () => {
         <div className="md:w-1/2 space-y-6 lg:space-y-8 px-6 lg:px-0 pt-20 md:pt-0">
         <h1 className="lg:text-6xl text-3xl font-bold lg:leading-tight font-serif text-gray-800">
               Hi There, <br />
-              I'm <span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-blue-500">AJMAL C A</span>
+              I'm <span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-blue-500">{profile.profile[0]?.name}</span>
             </h1>
 
             <p className="md:text-xl text-lg mb-6 text-gray-700 font-medium font-sans">
@@ -41,17 +47,17 @@ const Hero = () => {
               <img src={hero} alt="Profile" className="lg:h-[80vh] h-96 object-cover" />
               
               <img
-                src={reactLogo}
+                src={`http://localhost:5000${skills.skills[0]?.logo}`}
                 alt="React"
                 className="absolute w-14 top-1/4 -left-7 rounded-full animate-bounce-slow"
               />
               <img
-                src={reduxLogo}
+                src={`http://localhost:5000${skills.skills[1]?.logo}`}
                 alt="Next.js"
                 className="absolute w-14 top-10 right-0 animate-float"
               />
               <img
-                src={tailwind}
+                src={`http://localhost:5000${skills.skills[2]?.logo}`}
                 alt="Tailwind"
                 className="absolute w-14 rounded-full right-0 bottom-1/4 animate-pulse"
               />
