@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Edit, Save, X, Camera, Loader } from 'lucide-react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
-import { fetchProfile } from '../../redux/Store/fetching';
+import { fetchProfile } from '../../redux/Store/fetching.js';
 import { useDispatch, useSelector } from 'react-redux';
 import ProfileSkeleton from './Skeletons/ProfileSkeleton';
 
