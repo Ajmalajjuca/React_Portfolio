@@ -4,7 +4,7 @@ import { FaXTwitter } from "react-icons/fa6";
 import { FaGithub } from "react-icons/fa";
 import hero from "../../assets/a-realistic-cartoon-portrait-of-a-23-yea_ysAsbjWOSsSNA4hTWVix3g_ErxRV28sSyqTkSTdwUITAA-Photoroom.png";
 import { useSelector, useDispatch } from "react-redux";
-import { fetchProfile,fetchSkills } from "../../redux/Store/fetching.js";
+import { fetchProfile,fetchSkills } from "../../redux/Store/fetching";
 /* bg-[#FEFEFE] */
 const Hero = () => {
   const profile = useSelector(state => state.profile);
