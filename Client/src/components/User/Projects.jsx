@@ -6,7 +6,7 @@ import Youtube from "../../assets/Screenshot 2024-12-14 at 7.56.15 PM.jpeg";
 import Gemini from "../../assets/Gemini.jpeg";
 import Supercar from "../../assets/Supercar.png";
 import { useSelector, useDispatch } from "react-redux";
-import { fetchProjects } from "../../redux/Store/fetching";
+import { fetchProjects } from "../../redux/Store/fetching.js";
 import { useEffect } from "react";
 import { ExternalLink, Github } from "lucide-react";
 
