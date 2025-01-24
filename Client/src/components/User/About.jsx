@@ -1,7 +1,7 @@
 import React from "react";
 import {useEffect} from 'react';
 import {useSelector,useDispatch} from 'react-redux';
-import {fetchProfile, fetchSkills} from '../../redux/Store/fetching';
+import {fetchProfile, fetchSkills} from '../../redux/Store/fetching.js';
 
 const   About = () => {
   const profile = useSelector(state => state.profile);
