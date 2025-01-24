@@ -6,7 +6,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { getProjects, addProject, updateProject, deleteProject, setLoading, setError } from '../../redux/Slice/pojectSlice';
 import { Loader } from 'lucide-react';
 import { toast } from 'react-toastify';
-import { fetchProjects } from '../../redux/Store/fetching';
+import { fetchProjects } from '../../redux/Store/fetching.js';
 import ProjectSkeleton from './Skeletons/ProjectSkeleton';
 
 
