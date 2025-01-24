@@ -6,7 +6,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { getSkills, addSkill, updateSkill, deleteSkill, setLoading, setError } from '../../redux/Slice/skillSlice';
 import { Loader } from 'lucide-react';
 import { toast } from 'react-toastify';
-import { fetchSkills } from '../../redux/Store/fetching';
+import { fetchSkills } from '../../redux/Store/fetching.js';
 import SkillsSkeleton from './Skeletons/SkillsSkeleton';
 
 const SkillsManagement = () => {
