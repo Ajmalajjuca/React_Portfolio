@@ -6,7 +6,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { getProjects, addProject, updateProject, deleteProject, setLoading, setError } from '../../redux/Slice/pojectSlice';
 import { Loader } from 'lucide-react';
 import { toast } from 'react-toastify';
-import { fetchProjects } from '../../redux/Store/fetching';
+import { fetchProjects } from '../../redux/Store/fetching.js';
 import ProjectSkeleton from './Skeletons/ProjectSkeleton';
 
 
@@ -39,7 +39,7 @@ const ProjectsManagement = () => {
   const handleDeleteProject = async (id) => {
     dispatch(setLoading(true));
     try {
-      const res = await axios.delete(`http://localhost:5000/deleteProject/${id}`,{
+      const res = await axios.delete(`https://react-portfolio-server-iota.vercel.app/deleteProject/${id}`,{
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
@@ -80,7 +80,7 @@ const ProjectsManagement = () => {
         formData.append('image', selectedFile);
       }
       if (editingProject) {
-        const res = await axios.put(`http://localhost:5000/updateProject/${editingProject._id}`, formData, {
+        const res = await axios.put(`https://react-portfolio-server-iota.vercel.app/updateProject/${editingProject._id}`, formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
             'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -91,7 +91,7 @@ const ProjectsManagement = () => {
         setEditingProject(null);
         setIsAdding(false);
       } else {
-        const res = await axios.post('http://localhost:5000/projects', formData, {
+        const res = await axios.post('https://react-portfolio-server-iota.vercel.app/projects', formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
             'Authorization': `Bearer ${localStorage.getItem('token')}`

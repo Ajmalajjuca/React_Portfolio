@@ -7,7 +7,7 @@ export const fetchProjects = async (dispatch) => {
   dispatch(setProjectsLoading(true));
   try {
     console.log('fetchProjects');
-    const res = await axios.get('http://localhost:5000/getProjects');
+    const res = await axios.get('https://react-portfolio-server-iota.vercel.app/getProjects');
     dispatch(getProjects(res.data.projects));
   } catch (error) {
     dispatch(setProjectsError(error.message));
@@ -19,7 +19,7 @@ export const fetchProjects = async (dispatch) => {
 export const fetchSkills = async (dispatch) => {
   dispatch(setSkillsLoading(true));
   try {
-    const res = await axios.get('http://localhost:5000/getSkills');
+    const res = await axios.get('https://react-portfolio-server-iota.vercel.app/getSkills');
     dispatch(getSkills(res.data.skills));
   } catch (error) {
     dispatch(setSkillsError(error.message));
@@ -32,7 +32,7 @@ export const fetchProfile = async (dispatch) => {
   dispatch(setProfileLoading(true));
   try {
     console.log('fetchProfile');
-    const response = await axios.get('http://localhost:5000/profile');
+    const response = await axios.get('https://react-portfolio-server-iota.vercel.app/profile');
     console.log('response>>>>', response);
     if (response.data.profile) {
       dispatch(getProfile(response.data.profile));

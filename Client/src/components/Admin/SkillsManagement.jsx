@@ -6,7 +6,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { getSkills, addSkill, updateSkill, deleteSkill, setLoading, setError } from '../../redux/Slice/skillSlice';
 import { Loader } from 'lucide-react';
 import { toast } from 'react-toastify';
-import { fetchSkills } from '../../redux/Store/fetching';
+import { fetchSkills } from '../../redux/Store/fetching.js';
 import SkillsSkeleton from './Skeletons/SkillsSkeleton';
 
 const SkillsManagement = () => {
@@ -50,7 +50,7 @@ const SkillsManagement = () => {
   const handleDeleteSkill = async (id) => {
     dispatch(setLoading(true));
     try {
-      const res = await axios.delete(`http://localhost:5000/deleteSkill/${id}`,{
+      const res = await axios.delete(`https://react-portfolio-server-iota.vercel.app/deleteSkill/${id}`,{
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
@@ -93,7 +93,7 @@ const SkillsManagement = () => {
       }
 
       if (editingSkill) {
-        const res = await axios.put(`http://localhost:5000/updateSkill/${editingSkill._id}`, formData, {
+        const res = await axios.put(`https://react-portfolio-server-iota.vercel.app/updateSkill/${editingSkill._id}`, formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
             'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -103,7 +103,7 @@ const SkillsManagement = () => {
         toast.success('Skill updated successfully');
         setEditingSkill(null);
       } else {
-        const res = await axios.post('http://localhost:5000/skills', formData, {
+        const res = await axios.post('https://react-portfolio-server-iota.vercel.app/skills', formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
             'Authorization': `Bearer ${localStorage.getItem('token')}`

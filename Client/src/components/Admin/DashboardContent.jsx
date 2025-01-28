@@ -1,7 +1,7 @@
 import { Bell, Settings, User, Folder, Code, LogOut } from 'lucide-react';
 import React, { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { fetchProjects, fetchSkills } from '../../redux/Store/fetching';
+import { fetchProjects, fetchSkills } from '../../redux/Store/fetching.js';
 
 
 const stats = {
