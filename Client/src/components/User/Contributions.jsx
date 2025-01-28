@@ -3,15 +3,21 @@ import axios from 'axios';
 import GitHubCalendar from 'react-github-calendar';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { motion } from 'framer-motion';
+import {useDispatch,useSelector} from 'react-redux'
 
 const Contributions = () => {
   const [leetCodeStats, setLeetCodeStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [rank, setRank] = useState(null);
+  
+  const githubUsername = useSelector(state=>state.profile.profile[0]?.contributions?.github)
+  const leetCodeUsername = 'ajmal_ca'
 
-  const githubUsername = 'Ajmalajjuca';
-  const leetCodeUsername = 'ajmal_ca';
+  console.log('leetcode>>',leetCodeUsername, 'git>>',githubUsername)
+
+  
+ 
 
   useEffect(() => {
     const fetchLeetCodeStats = async () => {

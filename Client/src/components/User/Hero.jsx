@@ -1,6 +1,5 @@
 import React, { useEffect } from "react";
 import { FaInstagram, FaLinkedin } from "react-icons/fa";
-import { FaXTwitter } from "react-icons/fa6";
 import { FaGithub } from "react-icons/fa";
 import hero from "../../assets/a-realistic-cartoon-portrait-of-a-23-yea_ysAsbjWOSsSNA4hTWVix3g_ErxRV28sSyqTkSTdwUITAA-Photoroom.png";
 import { useSelector, useDispatch } from "react-redux";
@@ -66,19 +65,17 @@ const Hero = () => {
         </div>
       </div>
       <div className="absolute top-52 right-10 hidden bg-[#FEFEFE] p-4 md:flex flex-col gap-8 rounded-full">
-        <a href="https://github.com/joeltdev" target="blank">
+        {console.log('pro>>>',profile?.profile[0]?.socialLinks)}
+        <a href={profile.profile[0]?.socialLinks?.github} target="blank">
           {" "}
           <FaGithub className="w-10 h-10 text-gray-900" />
         </a>
-        <a href="https://www.instagram.com/" target="blank">
+        <a href={profile?.profile[0]?.socialLinks?.instagram} target="blank">
           {" "}
           <FaInstagram className="w-10 h-10 text-gray-900" />
         </a>
-        <a href="https://x.com/" target="blank">
-          <FaXTwitter className="w-10 h-10 text-gray-900" />
-        </a>{" "}
         <a
-          href="https://www.linkedin.com/in/joel-thomas-mathew-18422b1b8/"
+          href={profile?.profile[0]?.socialLinks?.linkedin}
           target="blank"
         >
           {" "}

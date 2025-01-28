@@ -15,45 +15,132 @@ export const getProfile = async (req, res) => {
 }
 
 export const postProfile = async (req, res) => {
-    const { name, title, bio, journey, aboutMe, email, phone, } = req.body;
-    console.log('req.body>>>>', req.body);
+    console.log('req.body>>',req.body)
+    if (req.body.socialLinks) {
+        req.body.socialLinks = JSON.parse(req.body.socialLinks);
+      }
+      if (req.body.contributions) {
+        req.body.contributions = JSON.parse(req.body.contributions);
+      }
+
+  
+      // Log the parsed body
+      console.log('Parsed request body:', req.body);
+      console.log('File:', req.file);
+    const { 
+        name, 
+        title, 
+        bio, 
+        journey, 
+        email, 
+        phone, 
+        socialLinks = {}, 
+        contributions = {},
+    } = req.body;
+
     const file = req.file;
-    if (!file) {
-        return res.status(400).json({ message: "No file uploaded" });
+    let avatarPath = null;
+
+    // Optional file upload
+    if (file) {
+        avatarPath = '/uploads/' + file.filename;
     }
-    if (!name || !title || !email || !phone) {
-        return res.status(400).json({ message: "All fields are required" });
+
+    if (!name || !email) {
+        return res.status(400).json({ message: "Name and email are required" });
     }
-    const avatarPath = '/uploads/' + file.filename;
-    console.log('avatarPath>>>>', avatarPath);
 
     try {
-        const newProfile = new Profile({ name, title, bio, journey, aboutMe, email, phone, avatar: avatarPath, });
+        const newProfile = new Profile({ 
+            name, 
+            title, 
+            bio, 
+            journey, 
+            email, 
+            phone, 
+            socialLinks,
+            contributions,
+            avatar: avatarPath
+        });
+
         await newProfile.save();
         res.status(201).json({ message: "Profile created successfully", profile: newProfile });
     } catch (error) {
-        console.log('postProfile error>>>>', error);
+        console.error('postProfile error:', error);
         res.status(500).json({ message: "Internal server error", error: error.message });
     }
 }
 
 export const updateProfile = async (req, res) => {
     const { id } = req.params;
-    const { name, title, bio, journey, aboutMe, email, phone, avatar } = req.body;
-    const file = req.file;
-    if (!file) {
-        return res.status(400).json({ message: "No file uploaded" });
-    }
-    const avatarPath = '/uploads/' + file.filename;
-    console.log('avatarPath>>>>', avatarPath);
+    
     try {
-        const updatedProfile = await Profile.findByIdAndUpdate(id, { name, title, bio, journey, aboutMe, email, phone, avatar: avatarPath }, { new: true });
-        res.status(200).json({ message: "Profile updated successfully", profile: updatedProfile });
+        // Parse JSON strings if they exist
+        if (req.body.socialLinks) {
+            req.body.socialLinks = JSON.parse(req.body.socialLinks);
+        }
+        if (req.body.contributions) {
+            req.body.contributions = JSON.parse(req.body.contributions);
+        }
+
+
+        console.log('Update Profile - Parsed request body:', req.body);
+        console.log('Update Profile - File:', req.file);
+
+        const { 
+            name, 
+            title, 
+            bio, 
+            journey, 
+            email, 
+            phone, 
+            socialLinks = {}, 
+            contributions = {},
+        } = req.body;
+
+        const file = req.file;
+        const updateData = { 
+            name, 
+            title, 
+            bio, 
+            journey, 
+            email, 
+            phone, 
+            socialLinks,
+            contributions,
+            
+            
+        };
+
+        // Optional file upload
+        if (file) {
+            updateData.avatar = '/uploads/' + file.filename;
+        }
+
+        // Remove undefined fields
+        Object.keys(updateData).forEach(key => 
+            updateData[key] === undefined && delete updateData[key]
+        );
+
+        const updatedProfile = await Profile.findByIdAndUpdate(
+            id, 
+            updateData,
+            { new: true, runValidators: true }
+        );
+
+        if (!updatedProfile) {
+            return res.status(404).json({ message: "Profile not found" });
+        }
+
+        res.status(200).json({ 
+            message: "Profile updated successfully", 
+            profile: updatedProfile 
+        });
     } catch (error) {
-        console.log('updateProfile error>>>>', error);
+        console.error('updateProfile error:', error);
         res.status(500).json({ message: "Internal server error", error: error.message });
     }
-}
+};
 
 const generateToken = (user) => {
     return jwt.sign(
