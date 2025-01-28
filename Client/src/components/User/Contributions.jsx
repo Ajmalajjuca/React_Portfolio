@@ -3,7 +3,7 @@ import axios from 'axios';
 import GitHubCalendar from 'react-github-calendar';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { motion } from 'framer-motion';
-import {useDispatch,useSelector} from 'react-redux'
+import { useSelector } from 'react-redux';
 
 const Contributions = () => {
   const [leetCodeStats, setLeetCodeStats] = useState(null);
@@ -11,13 +11,8 @@ const Contributions = () => {
   const [error, setError] = useState(null);
   const [rank, setRank] = useState(null);
   
-  const githubUsername = useSelector(state=>state.profile.profile[0]?.contributions?.github)
-  const leetCodeUsername = 'ajmal_ca'
-
-  console.log('leetcode>>',leetCodeUsername, 'git>>',githubUsername)
-
-  
- 
+  const githubUsername = useSelector(state => state.profile.profile[0]?.contributions?.github);
+  const leetCodeUsername = 'ajmal_ca';
 
   useEffect(() => {
     const fetchLeetCodeStats = async () => {
@@ -47,46 +42,43 @@ const Contributions = () => {
     dark: ['#161B22', '#0E4429', '#006D32', '#26A641', '#39D353'],
   };
 
-  const CustomTooltip = ({ contributionCount, date }) => (
-    <div className="bg-gray-800 text-white px-3 py-2 rounded-lg shadow-lg border border-gray-700">
-      <p className="font-medium">{new Date(date).toLocaleDateString('en-US')}</p>
-      <p className="text-green-400">{contributionCount} contributions</p>
-    </div>
-  );
-
   const StatCard = ({ title, value, total, color }) => (
     <motion.div
-      whileHover={{ scale: 1.05 }}
-      whileTap={{ scale: 0.95 }}
+      whileHover={{ scale: 1.02 }}
+      whileTap={{ scale: 0.98 }}
       className="bg-gray-700/50 p-4 rounded-xl shadow-lg"
     >
       <p className="text-gray-400 text-sm">{title}</p>
-      <p className={`text-2xl font-bold ${color}`}>{value}{total ? `/${total}` : ''}</p>
+      <p className={`text-xl md:text-2xl font-bold ${color}`}>
+        {value}{total ? `/${total}` : ''}
+      </p>
     </motion.div>
   );
 
   return (
-    <section className="py-16 bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900">
+    <section className="py-8 md:py-16 bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900">
       {/* GitHub Activity Tracker */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8 md:mb-12">
         <motion.div
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, ease: 'easeOut' }}
-          className="bg-gray-800 rounded-xl p-8 shadow-lg"
+          className="bg-gray-800 rounded-xl p-4 md:p-8 shadow-lg"
         >
-          <h3 className="text-3xl font-bold text-white mb-6 text-center">
+          <h3 className="text-2xl md:text-3xl font-bold text-white mb-4 md:mb-6 text-center">
             GitHub Activity
           </h3>
-          <div className="overflow-x-auto">
-            <GitHubCalendar
-              username={githubUsername}
-              theme={githubTheme}
-              fontSize={14}
-              blockSize={16}
-              blockMargin={4}
-              transformData={(contributions) => contributions.slice(-365)} // Last year
-            />
+          <div className="overflow-x-auto pb-4">
+            <div className="min-w-max">
+              <GitHubCalendar
+                username={githubUsername}
+                theme={githubTheme}
+                fontSize={12}
+                blockSize={12}
+                blockMargin={4}
+                transformData={(contributions) => contributions.slice(-365)}
+              />
+            </div>
           </div>
         </motion.div>
       </div>
@@ -97,14 +89,14 @@ const Contributions = () => {
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, ease: 'easeOut' }}
-          className="bg-gray-800 rounded-xl p-8 shadow-lg"
+          className="bg-gray-800 rounded-xl p-4 md:p-8 shadow-lg"
         >
-          <h3 className="text-3xl font-bold text-white mb-6 text-center">
+          <h3 className="text-2xl md:text-3xl font-bold text-white mb-4 md:mb-6 text-center">
             LeetCode Progress
           </h3>
           {loading ? (
-            <div className="flex justify-center items-center h-64">
-              <div className="w-16 h-16 border-4 border-green-500 border-t-transparent rounded-full animate-spin" />
+            <div className="flex justify-center items-center h-48 md:h-64">
+              <div className="w-12 h-12 md:w-16 md:h-16 border-4 border-green-500 border-t-transparent rounded-full animate-spin" />
             </div>
           ) : error ? (
             <div className="text-center text-red-500 p-4 bg-red-500/10 rounded-lg">
@@ -112,10 +104,10 @@ const Contributions = () => {
             </div>
           ) : (
             leetCodeStats && leetCodeStats.totalSolved !== null && (
-              <div className="grid grid-cols-2 gap-8">
-                {/* Left Side: Chart */}
-                <div className="col-span-1">
-                  <div className="h-64 mb-6">
+              <div className="flex flex-col md:grid md:grid-cols-2 gap-8">
+                {/* Chart */}
+                <div className="w-full">
+                  <div className="h-48 md:h-64 mb-6">
                     <ResponsiveContainer width="100%" height="100%">
                       <LineChart
                         data={[
@@ -123,6 +115,7 @@ const Contributions = () => {
                           { name: 'Medium', solved: leetCodeStats.mediumSolved || 0, total: leetCodeStats.totalMedium || 0 },
                           { name: 'Hard', solved: leetCodeStats.hardSolved || 0, total: leetCodeStats.totalHard || 0 }
                         ]}
+                        margin={{ top: 5, right: 20, bottom: 5, left: 0 }}
                       >
                         <XAxis dataKey="name" stroke="#9ca3af" />
                         <YAxis stroke="#9ca3af" />
@@ -146,14 +139,14 @@ const Contributions = () => {
                   </div>
                 </div>
 
-                {/* Right Side: Stats */}
-                <div className="col-span-1 space-y-6">
-                  <div className="grid grid-cols-2 gap-4 mb-6">
+                {/* Stats */}
+                <div className="space-y-4 md:space-y-6">
+                  <div className="grid grid-cols-2 gap-3 md:gap-4">
                     <StatCard title="Global Rank" value={`#${rank?.global}`} color="text-purple-400" />
                     <StatCard title="Country Rank" value={`#${rank?.country}`} color="text-blue-400" />
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-2 gap-3 md:gap-4">
                     <StatCard
                       title="Total Solved"
                       value={leetCodeStats.totalSolved || 0}

@@ -23,7 +23,7 @@ const TwoFactorAuth = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (otpCode.length === 6) {
-      axios.post('https://react-portfolio-server-iota.vercel.app/verify-otp', { otp: otpCode })
+      axios.post('http://localhost:5000/verify-otp', { otp: otpCode })
         .then(response => {
           localStorage.setItem('token', response.data.token);
           if (response.data.message === "OTP verified successfully") {
@@ -42,7 +42,7 @@ const TwoFactorAuth = () => {
 
   const handleSend = () => {
     setLoad(true);
-    axios.post('https://react-portfolio-server-iota.vercel.app/send-otp',)
+    axios.post('http://localhost:5000/send-otp',)
       .then(response => {
         toast.success('OTP sent successfully');
       })
