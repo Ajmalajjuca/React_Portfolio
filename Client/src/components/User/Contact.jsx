@@ -1,7 +1,4 @@
 import React, { useState } from "react";
-// import facebook from "../assets/facebook.png";
-// import instagram from "../assets/instagram.png";
-// import linkedin from "../assets/linkedin.png";
 import Lottie from "lottie-react";
 import contact from "../../assets/Contact.json";
 import Swal from "sweetalert2";
@@ -13,31 +10,37 @@ const Contact = () => {
 
   const onSubmit = async (event) => {
     event.preventDefault();
-    const formData = new FormData(event.target);
+    try{
 
-    formData.append("access_key", import.meta.env.VITE_WEB3FORMS_ACCESS_KEY);
-
-    const object = Object.fromEntries(formData);
-    const json = JSON.stringify(object);
-
-    const res = await fetch("https://api.web3forms.com/submit", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-      body: json,
-    }).then((res) => res.json());
-
-    if (res.success) {
-      setName("");
-      setEmail("");
-      setMessage("");
-      Swal.fire({
-        title: "Sucess!",
-        text: "Message sent succesfully",
-        icon: "success",
-      });
+      const formData = new FormData(event.target);
+  
+      formData.append("access_key", '557f0c9b-ff44-4e19-b21c-468cbcfe08df');
+  
+      const object = Object.fromEntries(formData);
+      const json = JSON.stringify(object);
+  
+      const res = await fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: json,
+      }).then((res) => res.json());
+  
+      if (res.success) {
+        setName("");
+        setEmail("");
+        setMessage("");
+        Swal.fire({
+          title: "Sucess!",
+          text: "Message sent succesfully",
+          icon: "success",
+        });
+      }
+    }catch(err){
+      console.log(err);
+      
     }
   };
 

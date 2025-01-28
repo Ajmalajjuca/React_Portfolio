@@ -58,27 +58,25 @@ const Contributions = () => {
   return (
     <section className="py-8 md:py-16 bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900">
       {/* GitHub Activity Tracker */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8 md:mb-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
         <motion.div
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, ease: 'easeOut' }}
-          className="bg-gray-800 rounded-xl p-4 md:p-8 shadow-lg"
+          className="bg-gray-800 rounded-xl p-8 shadow-lg"
         >
-          <h3 className="text-2xl md:text-3xl font-bold text-white mb-4 md:mb-6 text-center">
+          <h3 className="text-3xl font-bold text-white mb-6 text-center">
             GitHub Activity
           </h3>
-          <div className="overflow-x-auto pb-4">
-            <div className="min-w-max">
-              <GitHubCalendar
-                username={githubUsername}
-                theme={githubTheme}
-                fontSize={12}
-                blockSize={12}
-                blockMargin={4}
-                transformData={(contributions) => contributions.slice(-365)}
-              />
-            </div>
+          <div className="overflow-x-auto">
+            <GitHubCalendar
+              username={githubUsername}
+              theme={githubTheme}
+              fontSize={14}
+              blockSize={16}
+              blockMargin={4}
+              transformData={(contributions) => contributions.slice(-365)} // Last year
+            />
           </div>
         </motion.div>
       </div>
